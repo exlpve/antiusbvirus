@@ -1,0 +1,7 @@
+# Log files
+CleanLog.txt
+*.log
+
+# Temporary or scratch files
+.vscode/
+.idea/
