@@ -1,7 +1,7 @@
 # ==============================================================================
-# TOOL: LMIGuardian & PlugX USB Cleaner (Phien ban 8.5)
+# TOOL: Anti USB Virus - USB Malware Cleaner (Phien ban 9.0)
 # Tac gia: KN
-# Description: Liet ke thu muc me va cac file con trong ngoac don de nhan dien USB gon gang
+# Description: Phat hien va tieu diet ma doc LMIGuardian/PlugX tren USB va may tinh
 # ==============================================================================
 
 [CmdletBinding()]
@@ -14,14 +14,14 @@ param(
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
 # KHOA DON PHIEN (SINGLE-INSTANCE MUTEX): Tuyet doi chong mo 2 cua so cung luc
-$global:CleanerMutex = New-Object System.Threading.Mutex($false, "Global\LMIGuardian_Cleaner_SingleInstance_Mutex")
+$global:CleanerMutex = New-Object System.Threading.Mutex($false, "Global\AntiUSBVirus_Cleaner_SingleInstance")
 if (-not $global:CleanerMutex.WaitOne(0, $false)) {
     Exit
 }
 
 # Duong dan file Log (Luu cung thu muc voi script)
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-if (-not $ScriptDir) { $ScriptDir = "D:\LMIGuardian_Cleaner" }
+if (-not $ScriptDir) { $ScriptDir = "D:\AntiUSBVirus" }
 $LogFilePath = Join-Path $ScriptDir "CleanLog.txt"
 
 # Danh sach whitelist bao ve USB An Toan ATTT
@@ -157,8 +157,8 @@ $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 # ==============================================================================
 if (-not $CleanMode -and -not $isAdmin) {
     Clear-Host
-    Write-Header "KHOI DONG: QUET KIEM TRA MA DOC TREN MAY TINH & USB"
-    Write-Host " Phien ban: 8.5 (Nhan dien USB gom nhom Thuc Muc Me)" -ForegroundColor Gray
+    Write-Header "ANTI USB VIRUS - QUET KIEM TRA MA DOC TREN MAY TINH & USB"
+    Write-Host " Phien ban: 9.0 | LMIGuardian / PlugX USB Malware Cleaner" -ForegroundColor Gray
     Write-Host " Tac gia: KN" -ForegroundColor Gray
     Write-Host " Nguoi dung: $env:USERNAME | May: $env:COMPUTERNAME" -ForegroundColor Gray
     Write-Host ""
@@ -323,8 +323,8 @@ if (-not $CleanMode -and -not $isAdmin) {
 # CHE DO 2: DIET MA DOC & CUU DU LIEU (CLEAN MODE - QUYEN ADMINISTRATOR)
 # ==============================================================================
 Clear-Host
-Write-Header "TIEN HANH TIEU DIET MA DOC & CUU DU LIEU (QUYEN ADMINISTRATOR)"
-Write-Host " Phien ban: 8.5 | Chuyen tri LMIGuardian / USB An Toan ATTT" -ForegroundColor Gray
+Write-Header "ANTI USB VIRUS - TIEU DIET MA DOC & CUU DU LIEU (QUYEN ADMINISTRATOR)"
+Write-Host " Phien ban: 9.0 | LMIGuardian / PlugX USB Malware Cleaner" -ForegroundColor Gray
 Write-Host " Tac gia: KN" -ForegroundColor Gray
 Write-Host " Thoi gian xu ly: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor Gray
 Write-Host ""

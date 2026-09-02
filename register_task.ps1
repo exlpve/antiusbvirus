@@ -9,6 +9,9 @@ try {
     Write-Host '[*] Khong co task cu can xoa.'
 }
 
+$watcherPath = Join-Path $PSScriptRoot 'usb_watcher.ps1'
+if (-not (Test-Path $watcherPath)) { $watcherPath = 'D:\AntiUSBVirus\usb_watcher.ps1' }
+
 $xml = @"
 <?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
