@@ -10,8 +10,8 @@ param(
 )
 
 # Thiet lap ma hoa UTF-8
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-$OutputEncoding = [System.Text.Encoding]::UTF8
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
+try { $OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 
 # KHOA DON PHIEN (SINGLE-INSTANCE MUTEX): Tuyet doi chong mo 2 cua so cung luc
 $global:CleanerMutex = New-Object System.Threading.Mutex($false, "Global\AntiUSBVirus_Cleaner_SingleInstance")
@@ -50,25 +50,27 @@ function Write-CleanLog {
 
 function Write-Header {
     param([string]$Text)
-    Write-Host ""
-    Write-Host ("=" * 70) -ForegroundColor Cyan
-    Write-Host "  $Text" -ForegroundColor Yellow -BackgroundColor Black
-    Write-Host ("=" * 70) -ForegroundColor Cyan
+    try {
+        Write-Host ""
+        Write-Host ("=" * 70) -ForegroundColor Cyan
+        Write-Host "  $Text" -ForegroundColor Yellow -BackgroundColor Black
+        Write-Host ("=" * 70) -ForegroundColor Cyan
+    } catch {}
 }
 
 function Write-Success {
     param([string]$Text)
-    Write-Host " [+] $Text" -ForegroundColor Green
+    try { Write-Host " [+] $Text" -ForegroundColor Green } catch {}
 }
 
 function Write-WarningMsg {
     param([string]$Text)
-    Write-Host " [!] $Text" -ForegroundColor Yellow
+    try { Write-Host " [!] $Text" -ForegroundColor Yellow } catch {}
 }
 
 function Write-Danger {
     param([string]$Text)
-    Write-Host " [-] $Text" -ForegroundColor Red
+    try { Write-Host " [-] $Text" -ForegroundColor Red } catch {}
 }
 
 function Write-Info {
@@ -577,3 +579,7 @@ try { $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") } catch { Read-Hos
 Exit
 
 
+
+    try {
+    } catch {}
+}
