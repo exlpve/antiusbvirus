@@ -47,7 +47,7 @@ $xml = @"
   <Actions Context="Author">
     <Exec>
       <Command>powershell.exe</Command>
-      <Arguments>-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "D:\LMIGuardian_Cleaner\usb_watcher.ps1"</Arguments>
+      <Arguments>-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "D:\AntiUSBVirus\usb_watcher.ps1"</Arguments>
     </Exec>
   </Actions>
 </Task>
@@ -66,7 +66,7 @@ try {
 } catch {
     Write-Host "[!] Dang ky COM that bai: $($_.Exception.Message)"
     Write-Host "[*] Thu phuong an du phong: schtasks.exe..."
-    $watcherPath = 'D:\LMIGuardian_Cleaner\usb_watcher.ps1'
+    $watcherPath = 'D:\AntiUSBVirus\usb_watcher.ps1'
     schtasks.exe /delete /tn 'AutoUSB_Malware_Guard' /f 2>$null
     schtasks.exe /create /tn 'AutoUSB_Malware_Guard' /tr "powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$watcherPath`"" /sc onlogon /it /delay 0001:00 /f
     Write-Host '[+] Da dang ky qua schtasks.exe (phuong an du phong).'

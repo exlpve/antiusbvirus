@@ -227,7 +227,7 @@ if (-not $CleanMode -and -not $isAdmin) {
             try {
                 $badOnPc = Get-ChildItem -Path $d -Filter "*LMIGuardian*" -Recurse -Force -ErrorAction SilentlyContinue | Where-Object {
                     $_.FullName -notlike "*Program Files*LogMeIn*" -and
-                    $_.FullName -notmatch "AntiUSBVirus" -and
+                    $_.FullName -notmatch "LMIGuardian_Cleaner" -and
                     $_.FullName -notmatch "clean_lmiguardian" -and
                     $_.FullName -notlike "*\Microsoft\Windows\Recent\*"
                 }
@@ -414,7 +414,7 @@ foreach ($dir in $dirsToClean) {
         try {
             $badFiles = Get-ChildItem -Path $dir -Filter "*LMIGuardian*" -Recurse -Force -ErrorAction SilentlyContinue | Where-Object {
                 $_.FullName -notlike "*Program Files*LogMeIn*" -and
-                $_.FullName -notmatch "AntiUSBVirus" -and
+                $_.FullName -notmatch "LMIGuardian_Cleaner" -and
                 $_.FullName -notmatch "clean_lmiguardian" -and
                 $_.FullName -notlike "*\Microsoft\Windows\Recent\*"
             }
