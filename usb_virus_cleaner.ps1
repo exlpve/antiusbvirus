@@ -80,7 +80,7 @@ function Write-Info {
 function Get-UsbContentSummary {
     param([string]$DriveRoot)
     
-    $resultList = [System.Collections.Generic.List[string]]::new()
+    $resultList = (New-Object "System.Collections.Generic.List[string]")
     
     try {
         $rootEntries = [System.IO.Directory]::GetFileSystemEntries($DriveRoot)
@@ -105,7 +105,7 @@ function Get-UsbContentSummary {
             if ($trimmed.Length -eq 0 -or $eName -eq "..." -or $eName -eq "__") { continue }
             
             if ([System.IO.Directory]::Exists($entry)) {
-                $subItems = [System.Collections.Generic.List[string]]::new()
+                $subItems = (New-Object "System.Collections.Generic.List[string]")
                 try {
                     $subEntries = [System.IO.Directory]::GetFileSystemEntries($entry)
                     foreach ($sub in $subEntries) {
@@ -174,7 +174,7 @@ if (-not $CleanMode -and -not $isAdmin) {
         Write-CleanLog -Tag "USB_KET_NOI" -Message "Khong co o dia USB nao dang ket noi."
     }
 
-    $detectedThreats = [System.Collections.Generic.List[string]]::new()
+    $detectedThreats = (New-Object "System.Collections.Generic.List[string]")
 
     # 1. Quet tien trinh RAM
     Write-Info "1/4. Dang kiem tra tien trinh dang chay tren RAM..."
@@ -267,7 +267,7 @@ if (-not $CleanMode -and -not $isAdmin) {
             try {
                 $dirs = [System.IO.Directory]::GetDirectories($dRoot)
                 foreach ($dr in $dirs) {
-                    $drName = [System.IO.DirectoryInfo]::new($dr).Name
+                    $drName = (Split-Path $dr -Leaf)
                     if ($drName -match "^(Docusment|Document|Documents)$" -or $drName -match "LMIGuardian") {
                         $msg = "Thu muc ma doc tren USB $($dLetter): $drName"
                         $detectedThreats.Add($msg)
@@ -280,7 +280,7 @@ if (-not $CleanMode -and -not $isAdmin) {
                         try {
                             $subDirs = [System.IO.Directory]::GetDirectories($dr)
                             foreach ($sd in $subDirs) {
-                                $sName = [System.IO.DirectoryInfo]::new($sd).Name
+                                $sName = (Split-Path $sd -Leaf)
                                 $sTrim = $sName.Trim([char]32, [char]160, [char]8203, [char]9, [char]10, [char]13, [char]0)
                                 if ($sTrim.Length -eq 0 -or $sName -eq "..." -or $sName -eq "__") {
                                     $msg = "Thu muc khong ten (giau file) trong [$drName] tren USB $($dLetter)"
@@ -463,7 +463,7 @@ if ($usbDrives) {
         try {
             $topDirs = [System.IO.Directory]::GetDirectories($dRoot)
             foreach ($dp in $topDirs) {
-                $dName = [System.IO.DirectoryInfo]::new($dp).Name
+                $dName = (Split-Path $dp -Leaf)
                 if ($ATTT_Whitelist -contains $dName) { continue }
 
                 $isMal = $false
@@ -492,7 +492,7 @@ if ($usbDrives) {
         try {
             $validDirs = [System.IO.Directory]::GetDirectories($dRoot)
             foreach ($parentPath in $validDirs) {
-                $parentName = [System.IO.DirectoryInfo]::new($parentPath).Name
+                $parentName = (Split-Path $parentPath -Leaf)
                 if ($ATTT_Whitelist -contains $parentName) { continue }
 
                 $trimP = $parentName.Trim([char]32, [char]160, [char]8203, [char]9, [char]10, [char]13, [char]0)
@@ -515,7 +515,7 @@ if ($usbDrives) {
                     try {
                         $subDirs = [System.IO.Directory]::GetDirectories($parentPath)
                         foreach ($subPath in $subDirs) {
-                            $sName = [System.IO.DirectoryInfo]::new($subPath).Name
+                            $sName = (Split-Path $subPath -Leaf)
                             $sTrim = $sName.Trim([char]32, [char]160, [char]8203, [char]9, [char]10, [char]13, [char]0)
 
                             if ($sTrim.Length -eq 0 -or $sName -eq "..." -or $sName -eq "__") {
@@ -575,3 +575,5 @@ Write-CleanLog -Tag "KET_QUA" -Message "Hoan tat xu ly. Tong file cuu: $($report
 Write-Host "Nhan phim bat ky de thoat..." -ForegroundColor Gray
 try { $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") } catch { Read-Host }
 Exit
+
+
