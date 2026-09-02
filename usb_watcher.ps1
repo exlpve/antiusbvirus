@@ -30,12 +30,15 @@ Register-WmiEvent -Query $query -SourceIdentifier "AntiUSBVirus_UsbArrival" -Act
     if (($now - $global:LastTriggerTime).TotalSeconds -lt 8) { return }
     $global:LastTriggerTime = $now
 
-    # Cho Windows mount xong o dia (2 giay)
-    Start-Sleep -Seconds 2
+    # Cho Windows mount xong o dia (giam xuong 1 giay)
+    Start-Sleep -Seconds 1
 
-    # Kiem tra neu cleaner da dang chay
-    $running = Get-WmiObject Win32_Process -Filter "Name = 'powershell.exe'" -ErrorAction SilentlyContinue |
-               Where-Object { $_.CommandLine -match "usb_virus_cleaner" }
+    # Kiem tra nhanh neu cleaner da dang chay (dung Get-Process thay vi WMI - nhanh hon)
+    $running = $false
+    try {
+        $running = [bool](Get-Process -Name "powershell" -ErrorAction SilentlyContinue |
+            Where-Object { $_.MainWindowTitle -match "Anti USB Virus|usb_virus_cleaner" })
+    } catch {}
     if ($running) { return }
 
     # Ghi log kich hoat
