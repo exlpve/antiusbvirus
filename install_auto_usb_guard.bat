@@ -28,9 +28,9 @@ echo [*] Dang dung watcher cu (neu co)...
 powershell -NoProfile -ExecutionPolicy Bypass -File "%SCRIPT_DIR%stop_watcher.ps1" >nul 2>&1
 echo [+] Da dung watcher cu.
 
-:: 3. Khoi chay watcher moi ngay lap tuc trong session hien tai
+:: 3. Khoi chay watcher moi ngay lap tuc (dung WScript.Shell tranh thu nho cua so hien tai)
 echo [*] Dang khoi chay watcher moi...
-start "" /b powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%WATCHER_PATH%"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$s=New-Object -ComObject WScript.Shell; $s.Run('powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"%WATCHER_PATH%\"', 0, $false)" >nul 2>&1
 timeout /t 2 /nobreak >nul
 echo [+] Watcher da duoc khoi chay.
 
