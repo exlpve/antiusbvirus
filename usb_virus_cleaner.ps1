@@ -13,6 +13,23 @@ param(
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 try { $OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 
+# Override Write-Host toan cuc: bao ve moi lenh Write-Host khoi loi 0x1F tren Win7
+function Write-Host {
+    param(
+        [Parameter(Position=0, ValueFromPipeline=$true)]$Object,
+        [System.ConsoleColor]$ForegroundColor,
+        [System.ConsoleColor]$BackgroundColor,
+        [switch]$NoNewline
+    )
+    try {
+        $params = @{}
+        if ($PSBoundParameters.ContainsKey('ForegroundColor')) { $params.ForegroundColor = $ForegroundColor }
+        if ($PSBoundParameters.ContainsKey('BackgroundColor')) { $params.BackgroundColor = $BackgroundColor }
+        if ($NoNewline) { $params.NoNewline = $true }
+        Microsoft.PowerShell.Utility\Write-Host $Object @params
+    } catch {}
+}
+
 # KHOA DON PHIEN (SINGLE-INSTANCE MUTEX): Tuyet doi chong mo 2 cua so cung luc
 $global:CleanerMutex = New-Object System.Threading.Mutex($false, "Global\AntiUSBVirus_Cleaner_SingleInstance")
 if (-not $global:CleanerMutex.WaitOne(0, $false)) {
