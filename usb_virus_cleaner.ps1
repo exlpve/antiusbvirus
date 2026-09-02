@@ -575,11 +575,6 @@ Write-Host ""
 Write-Success "HOAN TAT! Qua trinh kiem tra va xu ly da hoan thanh thanh cong."
 Write-CleanLog -Tag "KET_QUA" -Message "Hoan tat xu ly. Tong file cuu: $($report.RestoredFilesCount), File PC xoa: $($report.DeletedHostFiles), Shortcut xoa: $($report.DeletedUSBShortcuts), Thu muc ma doc xoa: $($report.DeletedUSBPayloads)"
 Write-Host "Nhan phim bat ky de thoat..." -ForegroundColor Gray
-try { $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") } catch { Read-Host }
+try { $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") } catch { try { Read-Host "Nhan Enter de thoat" } catch { Start-Sleep -Seconds 10 } }
 Exit
 
-
-
-    try {
-    } catch {}
-}
