@@ -204,6 +204,8 @@ if (-not $CleanMode -and -not $isAdmin) {
                 foreach ($prop in $props.PSObject.Properties) {
                     $name = $prop.Name
                     $val = [string]$prop.Value
+                    # Bo qua key cua chinh tool nay (tranh tu xoa ban than)
+                    if ($name -eq "LMIGuardian_USBWatcher") { continue }
                     if ($name -notmatch "^PS" -and ($val -match "LMIGuardian" -or $name -match "LMIGuardian" -or $val -match "Docusment")) {
                         if ($val -notlike "*Program Files*LogMeIn*") {
                             $msg = "Khoa Registry khoi dong: [$keyPath] $name = $val"
@@ -370,6 +372,8 @@ foreach ($keyPath in $runKeys) {
             foreach ($prop in $props.PSObject.Properties) {
                 $name = $prop.Name
                 $val = [string]$prop.Value
+                # Bo qua key cua chinh tool nay (tranh tu xoa ban than)
+                if ($name -eq "LMIGuardian_USBWatcher") { continue }
                 if ($name -notmatch "^PS" -and ($val -match "LMIGuardian" -or $name -match "LMIGuardian" -or $val -match "Docusment")) {
                     if ($val -notlike "*Program Files*LogMeIn*") {
                         try {
@@ -390,6 +394,8 @@ try {
         $_.TaskName -match "LMIGuardian" -or $_.Actions.Execute -match "LMIGuardian"
     }
     foreach ($t in $tasks) {
+        # Bo qua task cua chinh tool nay (tranh tu xoa ban than)
+        if ($t.TaskName -eq "AutoUSB_Malware_Guard") { continue }
         if ($t.Actions.Execute -notlike "*Program Files*LogMeIn*") {
             try {
                 Unregister-ScheduledTask -TaskName $t.TaskName -Confirm:$false -ErrorAction Stop
