@@ -18,7 +18,7 @@ set "LAUNCH_CMD=powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle H
 :: HKCU\Software\Microsoft\Windows\CurrentVersion\Run chay cung nguoi dung hien tai
 :: Dam bao watcher chay DUNG trong session co desktop (khac Task Scheduler/SYSTEM)
 echo [*] Dang ghi vao Registry Run Key (HKCU)...
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "LMIGuardian_USBWatcher" /t REG_SZ /d "%LAUNCH_CMD%" /f >nul 2>&1
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "AntiUSBVirus_Watcher" /t REG_SZ /d "%LAUNCH_CMD%" /f >nul 2>&1
 
 if %errorlevel% equ 0 (
     echo [+] Da ghi Registry Run Key thanh cong.
