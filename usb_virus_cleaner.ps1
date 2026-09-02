@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # TOOL: Anti USB Virus - USB Malware Cleaner (Phien ban 9.0)
 # Tac gia: KN
 # Description: Phat hien va tieu diet ma doc LMIGuardian/PlugX tren USB va may tinh
@@ -164,7 +164,7 @@ if (-not $CleanMode -and -not $isAdmin) {
     Write-Host ""
 
     # Ghi thong tin USB ket noi vao Log
-    $usbDrives = Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DriveType=2" -ErrorAction SilentlyContinue
+    $usbDrives = Get-WmiObject -Class Win32_LogicalDisk -Filter "DriveType=2" -ErrorAction SilentlyContinue
     if ($usbDrives) {
         foreach ($usb in $usbDrives) {
             $usbInfoStr = Get-UsbDetailString -usbObj $usb
@@ -389,20 +389,18 @@ foreach ($keyPath in $runKeys) {
     }
 }
 
+# Xoa Scheduled Task lien quan LMIGuardian (dung schtasks.exe - tuong thich Win7+)
 try {
-    $tasks = Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object {
-        $_.TaskName -match "LMIGuardian" -or $_.Actions.Execute -match "LMIGuardian"
-    }
-    foreach ($t in $tasks) {
-        # Bo qua task cua chinh tool nay (tranh tu xoa ban than)
-        if ($t.TaskName -eq "AutoUSB_Malware_Guard") { continue }
-        if ($t.Actions.Execute -notlike "*Program Files*LogMeIn*") {
-            try {
-                Unregister-ScheduledTask -TaskName $t.TaskName -Confirm:$false -ErrorAction Stop
-                Write-Success "Da xoa Scheduled Task: $($t.TaskName)"
-                Write-CleanLog -Tag "DA_XOA_TASK" -Message "$($t.TaskName)"
+    $taskList = schtasks.exe /query /fo CSV /nh 2>$null | ConvertFrom-Csv -Header TaskName,NextRun,Status -ErrorAction SilentlyContinue
+    if ($taskList) {
+        foreach ($t in $taskList) {
+            $tName = $t.TaskName -replace "^\\\\",""
+            if ($tName -match "LMIGuardian" -and $tName -ne "AutoUSB_Malware_Guard") {
+                schtasks.exe /delete /tn $tName /f 2>$null | Out-Null
+                Write-Success "Da xoa Scheduled Task: $tName"
+                Write-CleanLog -Tag "DA_XOA_TASK" -Message "$tName"
                 $report.CleanedTasks++
-            } catch {}
+            }
         }
     }
 } catch {}
@@ -433,7 +431,7 @@ foreach ($dir in $dirsToClean) {
 
 # GIAI DOAN 2: XU LY USB
 Write-Header "4. XU LY USB - TIEU DIET MA DOC & CUU DU LIEU VE THU MUC ME"
-$usbDrives = Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DriveType=2" -ErrorAction SilentlyContinue
+$usbDrives = Get-WmiObject -Class Win32_LogicalDisk -Filter "DriveType=2" -ErrorAction SilentlyContinue
 
 if ($usbDrives) {
     foreach ($usb in $usbDrives) {
