@@ -1,56 +1,78 @@
 # ==============================================================================
-# TOOL: Anti USB Virus - USB Event Watcher (Phien ban 9.0)
+# TOOL: Anti USB Virus - USB Event Watcher (Phien ban 10.0 - Polling Mode)
 # Tac gia: KN
-# Mo ta: Chay trong session nguoi dung, lang nghe su kien cam USB va kich hoat cleaner
+# Mo ta: Polling moi 2 giay thay vi WMI event (nhanh hon tren Win7)
 # ==============================================================================
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 if (-not $ScriptDir -or $ScriptDir -eq "") { $ScriptDir = "D:\AntiUSBVirus" }
-$CleanerScript = Join-Path $ScriptDir "usb_virus_cleaner.ps1"
 
 # Kiem tra Mutex: Chi cho phep 1 phien watcher duy nhat
 $global:WatcherMutex = New-Object System.Threading.Mutex($false, "Global\AntiUSBVirus_Watcher_SingleInstance")
 if (-not $global:WatcherMutex.WaitOne(0, $false)) {
-    # Da co 1 watcher dang chay, thoat ngay
     Exit
 }
 
-# Bien chong spam: Debounce 8 giay
-$global:LastTriggerTime = [DateTime]::MinValue
+$CleanerPath = Join-Path $ScriptDir "usb_virus_cleaner.ps1"
+$LogPath     = Join-Path $ScriptDir "watcher_activity.log"
 
-# Dang ky lang nghe su kien USB cam vao
-$query = "SELECT * FROM Win32_VolumeChangeEvent WHERE EventType = 2"
-Unregister-Event -SourceIdentifier "AntiUSBVirus_UsbArrival" -ErrorAction SilentlyContinue
-
-# Luu duong dan cleaner vao bien de dung trong action
-$env:CLEANER_PATH = Join-Path $ScriptDir "usb_virus_cleaner.ps1"
-
-Register-WmiEvent -Query $query -SourceIdentifier "AntiUSBVirus_UsbArrival" -Action {
-    $now = Get-Date
-    if (($now - $global:LastTriggerTime).TotalSeconds -lt 8) { return }
-    $global:LastTriggerTime = $now
-
-    # Cho Windows mount xong o dia (giam xuong 1 giay)
-    Start-Sleep -Seconds 1
-
-    # Kiem tra nhanh neu cleaner da dang chay (dung Get-Process thay vi WMI - nhanh hon)
-    $running = $false
+# Ham lay danh sach o USB hien tai
+function Get-UsbDrives {
     try {
-        $running = [bool](Get-Process -Name "powershell" -ErrorAction SilentlyContinue |
-            Where-Object { $_.MainWindowTitle -match "Anti USB Virus|usb_virus_cleaner" })
+        return [System.IO.DriveInfo]::GetDrives() |
+            Where-Object { $_.DriveType -eq "Removable" } |
+            ForEach-Object { $_.Name }
+    } catch {
+        return @()
+    }
+}
+
+# Ham kiem tra cleaner da chay chua
+function Is-CleanerRunning {
+    try {
+        $procs = Get-Process -Name "powershell" -ErrorAction SilentlyContinue
+        foreach ($p in $procs) {
+            try {
+                if ($p.MainWindowTitle -match "Anti USB Virus") { return $true }
+            } catch {}
+        }
     } catch {}
-    if ($running) { return }
+    return $false
+}
 
-    # Ghi log kich hoat
-    $logLine = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] USB cam vao - Kich hoat cleaner"
-    Add-Content -Path "$env:CLEANER_PATH\..\watcher_activity.log" -Value $logLine -ErrorAction SilentlyContinue
+# Ham khoi chay cleaner
+function Start-Cleaner {
+    try {
+        $shell = New-Object -ComObject WScript.Shell
+        $shell.Run("powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$CleanerPath`"", 1, $false)
+        $logLine = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] USB cam vao - Kich hoat cleaner"
+        Add-Content -Path $LogPath -Value $logLine -ErrorAction SilentlyContinue
+    } catch {}
+}
 
-    # Khoi chay cua so cleaner trong session nguoi dung hien tai
-    $shell = New-Object -ComObject WScript.Shell
-    $shell.Run("powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$env:CLEANER_PATH`"", 1, $false)
-} | Out-Null
+# Lay danh sach USB ban dau
+$prevDrives = Get-UsbDrives
+$lastTrigger = [DateTime]::MinValue
 
-# Vong lap giu watcher song
+# Vong lap polling chinh - kiem tra moi 2 giay
 while ($true) {
-    Start-Sleep -Seconds 30
+    Start-Sleep -Seconds 2
+
+    $currDrives = Get-UsbDrives
+
+    # Tim USB moi cam vao
+    $newDrives = $currDrives | Where-Object { $prevDrives -notcontains $_ }
+
+    if ($newDrives) {
+        $now = Get-Date
+        # Debounce 8 giay
+        if (($now - $lastTrigger).TotalSeconds -ge 8) {
+            $lastTrigger = $now
+            if (-not (Is-CleanerRunning)) {
+                Start-Cleaner
+            }
+        }
+    }
+
+    $prevDrives = $currDrives
 }
