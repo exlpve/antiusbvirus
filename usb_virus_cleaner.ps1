@@ -307,8 +307,11 @@ if (-not $CleanMode -and -not $isAdmin) {
         Write-Success "Khong phat hien bat ky dau hieu ma doc LMIGuardian hay Shortcut nao!"
         Write-Success "May tinh va USB cua ban da an toan tuyet doi."
         Write-CleanLog -Tag "KET_QUA" -Message "He thong va USB hoan toan sach se 100%. Khong co ma doc."
-        Write-Host "Nhan phim bat ky de thoat..." -ForegroundColor Gray
-        try { $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") } catch { Read-Host }
+                Write-Host "" -ForegroundColor Gray
+        for ($i = 5; $i -ge 1; $i--) {
+            try { Write-Host "`r Cua so se tu dong dong sau $i giay..." -ForegroundColor Gray -NoNewline } catch {}
+            Start-Sleep -Seconds 1
+        }
         Exit
     } else {
         Write-Header "CANH BAO: PHAT HIEN $($detectedThreats.Count) NGUY CO MA DOC!"
@@ -574,7 +577,7 @@ Write-Host ("=" * 70) -ForegroundColor Cyan
 Write-Host ""
 Write-Success "HOAN TAT! Qua trinh kiem tra va xu ly da hoan thanh thanh cong."
 Write-CleanLog -Tag "KET_QUA" -Message "Hoan tat xu ly. Tong file cuu: $($report.RestoredFilesCount), File PC xoa: $($report.DeletedHostFiles), Shortcut xoa: $($report.DeletedUSBShortcuts), Thu muc ma doc xoa: $($report.DeletedUSBPayloads)"
-Write-Host "Nhan phim bat ky de thoat..." -ForegroundColor Gray
-try { $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") } catch { try { Read-Host "Nhan Enter de thoat" } catch { Start-Sleep -Seconds 10 } }
+Write-Host ">>> Bam phim bat ky de dong cua so..." -ForegroundColor Yellow
+try { $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") } catch { try { Read-Host "Nhan Enter de dong" } catch { Start-Sleep -Seconds 60 } }
 Exit
 
